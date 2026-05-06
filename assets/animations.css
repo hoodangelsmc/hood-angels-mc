@@ -292,6 +292,25 @@ nav {
     transform: translateY(-1px) !important;
     box-shadow: 0 5px 15px rgba(255,255,255,0.05);
 }
+/* ============================================
+   CUSTOM CURSOR — Scorpion Theme
+   ============================================ */
+
+/* Ana imleci akrep yap */
+html, body {
+    cursor: url('../favicon.svg') 16 16, auto !important;
+}
+
+/* Tıklanabilir öğelerde imleç */
+a, button, .btn-primary, .menu-toggle, .gallery-item, .nav-btn, [role="button"] {
+    cursor: url('../favicon.svg') 16 16, pointer !important;
+}
+
+/* Çok büyük resimlerin imleç olarak kullanılmasını engellemek için 
+   küçük bir versiyonu yoksa CSS ile boyutlandırılamaz (resmin kendisi küçük olmalı).
+   Ancak tarayıcılar genellikle 32x32 veya 64x64 sınırını aşanları yoksayar.
+   Eğer logo.png çok büyükse, kullanıcıya bildirmek gerekebilir veya 
+   standart bir emoji/icon kullanılabilir. */
 
 /* ============================================
    GALERİ — Fotoğraf Hover Geliştirmeleri
