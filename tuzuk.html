@@ -122,6 +122,7 @@
     </style>
   <script async type="module" crossorigin src="./assets/tuzuk-legacy-aYYHVIdB.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/style-legacy-toXfV2aB.js">
+  <link rel="stylesheet" href="./assets/mobile.css">
 </head>
 <body>
 
@@ -137,6 +138,9 @@
                 <li><a href="tuzuk.html" class="active">Tüzük</a></li>
                 <li><a href="iletisim.html">İletişim</a></li>
             </ul>
+            <div class="menu-toggle">
+                <span></span><span></span><span></span>
+            </div>
         </div>
     </nav>
 
@@ -195,6 +199,23 @@
                 document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
             }, 100);
         };
+    </script>
+    <script>
+        // Hamburger menu toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+            document.querySelectorAll('.nav-links a').forEach(a => {
+                a.addEventListener('click', () => {
+                    menuToggle.classList.remove('active');
+                    navLinks.classList.remove('active');
+                });
+            });
+        }
     </script>
   <script crossorigin id="vite-legacy-polyfill" src="./assets/polyfills-legacy-XJe6vqej.js"></script>
   <script crossorigin id="vite-legacy-entry" data-src="./assets/tuzuk-legacy-aYYHVIdB.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
