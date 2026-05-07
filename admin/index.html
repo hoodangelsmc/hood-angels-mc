@@ -1,335 +1,579 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin | Scorpion MC</title>
-<link rel="stylesheet" href="../assets/animations.css">
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:#000;color:#fff;font-family:'Inter',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
-  .screen{display:none;width:100%;max-width:480px;animation:fadeIn .5s ease}
-  .screen.active{display:block}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-  h1{font-family:'Hessian',serif;font-size:2.8rem;letter-spacing:6px;text-align:center;margin-bottom:.5rem}
-  .subtitle{color:#666;text-align:center;letter-spacing:2px;font-size:.85rem;margin-bottom:3rem}
-  .form-group{margin-bottom:1.5rem}
-  label{display:block;color:#888;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:.6rem}
-  input[type=text],input[type=password],input[type=date],input[type=file]{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:1rem;color:#fff;font-family:'Inter',sans-serif;font-size:.95rem;outline:none;transition:border .3s}
-  input:focus{border-color:rgba(255,255,255,0.4)}
-  input[type=file]{cursor:pointer}
-  .btn{width:100%;padding:1.2rem;background:#fff;color:#000;font-family:'Hessian',serif;font-size:1.2rem;letter-spacing:3px;border:none;cursor:pointer;transition:all .3s;margin-top:.5rem}
-  .btn:hover{background:#ddd;transform:translateY(-2px)}
-  .btn:disabled{background:#333;color:#666;cursor:not-allowed;transform:none}
-  .btn-outline{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.2)}
-  .btn-outline:hover{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.4)}
-  .error{color:#ff4d4d;font-size:.85rem;margin-top:1rem;text-align:center;display:none}
-  .success{color:#4dff88;font-size:.85rem;margin-top:1rem;text-align:center;display:none}
-  .divider{border:none;border-top:1px solid rgba(255,255,255,0.07);margin:2rem 0}
-  .help-text{color:#555;font-size:.78rem;margin-top:.5rem;line-height:1.6}
-  .help-text a{color:#888;text-decoration:underline}
-  .preview-img{width:100%;max-height:200px;object-fit:cover;margin-bottom:1rem;display:none}
-  .progress-bar{height:3px;background:rgba(255,255,255,0.1);margin-top:1.5rem;overflow:hidden;display:none}
-  .progress-fill{height:100%;background:#fff;width:0%;transition:width .3s}
-  .step-indicator{display:flex;justify-content:center;gap:8px;margin-bottom:2rem}
-  .step{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);transition:background .3s}
-  .step.active{background:#fff}
-  .back-link{display:block;text-align:center;margin-top:1.5rem;color:#555;font-size:.8rem;cursor:pointer;letter-spacing:2px;transition:color .3s}
-  .back-link:hover{color:#fff}
-  .config-summary{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);padding:1.2rem;margin-bottom:1.5rem;font-size:.8rem;color:#666;line-height:1.8}
-  .config-summary strong{color:#888}
-  .tag{display:inline-block;background:rgba(255,255,255,0.08);color:#888;font-size:.7rem;padding:.2rem .6rem;letter-spacing:1px;margin-right:.5rem}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Scorpion MC</title>
+  <link rel="stylesheet" href="../assets/animations.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      background: #000;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 480px;
+      animation: fadeIn .5s ease
+    }
+
+    .screen.active {
+      display: block
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    h1 {
+      font-family: 'Hessian', serif;
+      font-size: 2.8rem;
+      letter-spacing: 6px;
+      text-align: center;
+      margin-bottom: .5rem
+    }
+
+    .subtitle {
+      color: #666;
+      text-align: center;
+      letter-spacing: 2px;
+      font-size: .85rem;
+      margin-bottom: 3rem
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem
+    }
+
+    label {
+      display: block;
+      color: #888;
+      font-size: .8rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: .6rem
+    }
+
+    input[type=text],
+    input[type=password],
+    input[type=date],
+    input[type=file] {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: .95rem;
+      outline: none;
+      transition: border .3s
+    }
+
+    input:focus {
+      border-color: rgba(255, 255, 255, 0.4)
+    }
+
+    input[type=file] {
+      cursor: pointer
+    }
+
+    .btn {
+      width: 100%;
+      padding: 1.2rem;
+      background: #fff;
+      color: #000;
+      font-family: 'Hessian', serif;
+      font-size: 1.2rem;
+      letter-spacing: 3px;
+      border: none;
+      cursor: pointer;
+      transition: all .3s;
+      margin-top: .5rem
+    }
+
+    .btn:hover {
+      background: #ddd;
+      transform: translateY(-2px)
+    }
+
+    .btn:disabled {
+      background: #333;
+      color: #666;
+      cursor: not-allowed;
+      transform: none
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2)
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.4)
+    }
+
+    .error {
+      color: #ff4d4d;
+      font-size: .85rem;
+      margin-top: 1rem;
+      text-align: center;
+      display: none
+    }
+
+    .success {
+      color: #4dff88;
+      font-size: .85rem;
+      margin-top: 1rem;
+      text-align: center;
+      display: none
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      margin: 2rem 0
+    }
+
+    .help-text {
+      color: #555;
+      font-size: .78rem;
+      margin-top: .5rem;
+      line-height: 1.6
+    }
+
+    .help-text a {
+      color: #888;
+      text-decoration: underline
+    }
+
+    .preview-img {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      margin-bottom: 1rem;
+      display: none
+    }
+
+    .progress-bar {
+      height: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      margin-top: 1.5rem;
+      overflow: hidden;
+      display: none
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #fff;
+      width: 0%;
+      transition: width .3s
+    }
+
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 2rem
+    }
+
+    .step {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transition: background .3s
+    }
+
+    .step.active {
+      background: #fff
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #555;
+      font-size: .8rem;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: color .3s
+    }
+
+    .back-link:hover {
+      color: #fff
+    }
+
+    .config-summary {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+      font-size: .8rem;
+      color: #666;
+      line-height: 1.8
+    }
+
+    .config-summary strong {
+      color: #888
+    }
+
+    .tag {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.08);
+      color: #888;
+      font-size: .7rem;
+      padding: .2rem .6rem;
+      letter-spacing: 1px;
+      margin-right: .5rem
+    }
+  </style>
 </head>
+<script src="admin.js"></script>
+
 <body>
 
-<!-- EKRAN 1: GİRİŞ -->
-<div class="screen active" id="screen-login">
-  <div class="step-indicator"><div class="step active"></div><div class="step"></div><div class="step"></div></div>
-  <h1>GİRİŞ</h1>
-  <p class="subtitle">SCORPION MC ADMIN PANELİ</p>
-  <div class="form-group">
-    <label>Şifre</label>
-    <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
-  </div>
-  <button class="btn" onclick="doLogin()">GİRİŞ YAP</button>
-  <div class="error" id="login-error">Yanlış şifre!</div>
-</div>
-
-<!-- EKRAN 2: AYARLAR (ilk kurulum) -->
-<div class="screen" id="screen-config">
-  <div class="step-indicator"><div class="step"></div><div class="step active"></div><div class="step"></div></div>
-  <h1>AYARLAR</h1>
-  <p class="subtitle">BİR KERE GİRİLECEK</p>
-
-  <hr class="divider">
-  <p class="help-text" style="margin-bottom:1.5rem">
-    <strong style="color:#aaa">Cloudinary:</strong> <a href="https://cloudinary.com" target="_blank">cloudinary.com</a>'a ücretsiz kayıt ol → Dashboard'da Cloud Name'i al → Settings > Upload > Add upload preset → Mode: <strong style="color:#aaa">Unsigned</strong>
-  </p>
-  <div class="form-group">
-    <label>Cloudinary Cloud Name</label>
-    <input type="text" id="cfg-cloud" placeholder="örn: dxxxxxx">
-  </div>
-  <div class="form-group">
-    <label>Cloudinary Upload Preset (Unsigned)</label>
-    <input type="text" id="cfg-preset" placeholder="örn: ml_default">
+  <!-- EKRAN 1: GİRİŞ -->
+  <div class="screen active" id="screen-login">
+    <div class="step-indicator">
+      <div class="step active"></div>
+      <div class="step"></div>
+      <div class="step"></div>
+    </div>
+    <h1>GİRİŞ</h1>
+    <p class="subtitle">SCORPION MC ADMIN PANELİ</p>
+    <div class="form-group">
+      <label>Şifre</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn" onclick="doLogin()">GİRİŞ YAP</button>
+    <div class="error" id="login-error">Yanlış şifre!</div>
   </div>
 
-  <hr class="divider">
-  <p class="help-text" style="margin-bottom:1.5rem">
-    <strong style="color:#aaa">GitHub Token:</strong> <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a> → Repo seç → "Contents" iznini ver → Token'ı kopyala
-  </p>
-  <div class="form-group">
-    <label>GitHub Token</label>
-    <input type="password" id="cfg-token" placeholder="ghp_xxxxxxxxxxxx">
+  <!-- EKRAN 2: AYARLAR (ilk kurulum) -->
+  <div class="screen" id="screen-config">
+    <div class="step-indicator">
+      <div class="step"></div>
+      <div class="step active"></div>
+      <div class="step"></div>
+    </div>
+    <h1>AYARLAR</h1>
+    <p class="subtitle">BİR KERE GİRİLECEK</p>
+
+    <hr class="divider">
+    <p class="help-text" style="margin-bottom:1.5rem">
+      <strong style="color:#aaa">Cloudinary:</strong> <a href="https://cloudinary.com"
+        target="_blank">cloudinary.com</a>'a ücretsiz kayıt ol → Dashboard'da Cloud Name'i al → Settings > Upload > Add
+      upload preset → Mode: <strong style="color:#aaa">Unsigned</strong>
+    </p>
+    <div class="form-group">
+      <label>Cloudinary Cloud Name</label>
+      <input type="text" id="cfg-cloud" placeholder="örn: dxxxxxx">
+    </div>
+    <div class="form-group">
+      <label>Cloudinary Upload Preset (Unsigned)</label>
+      <input type="text" id="cfg-preset" placeholder="örn: ml_default">
+    </div>
+
+    <hr class="divider">
+    <p class="help-text" style="margin-bottom:1.5rem">
+      <strong style="color:#aaa">GitHub Token:</strong> <a href="https://github.com/settings/tokens/new"
+        target="_blank">github.com/settings/tokens/new</a> → Repo seç → "Contents" iznini ver → Token'ı kopyala
+    </p>
+    <div class="form-group">
+      <label>GitHub Token</label>
+      <input type="password" id="cfg-token" placeholder="ghp_xxxxxxxxxxxx">
+    </div>
+    <div class="form-group">
+      <label>GitHub Kullanıcı Adı</label>
+      <input type="text" id="cfg-owner" placeholder="örn: scorpionsmc">
+    </div>
+    <div class="form-group">
+      <label>GitHub Repo Adı</label>
+      <input type="text" id="cfg-repo" placeholder="örn: scorpionmc">
+    </div>
+
+    <button class="btn" onclick="saveConfig()">KAYDET VE DEVAM ET</button>
+    <div class="error" id="config-error">Tüm alanları doldurun!</div>
   </div>
-  <div class="form-group">
-    <label>GitHub Kullanıcı Adı</label>
-    <input type="text" id="cfg-owner" placeholder="örn: scorpionsmc">
+
+  <!-- EKRAN 3: YÜKLEME -->
+  <div class="screen" id="screen-upload">
+    <div class="step-indicator">
+      <div class="step"></div>
+      <div class="step"></div>
+      <div class="step active"></div>
+    </div>
+    <h1>FOTOĞRAF EKLE</h1>
+    <p class="subtitle">GALERİYE YENİ FOTOĞRAF EKLE</p>
+
+    <div class="config-summary" id="config-summary"></div>
+
+    <img class="preview-img" id="preview" src="" alt="Önizleme">
+
+    <div class="form-group">
+      <label>Fotoğraf Seç</label>
+      <input type="file" id="upload-file" accept="image/*" onchange="previewFile(this)">
+    </div>
+    <div class="form-group">
+      <label>Başlık</label>
+      <input type="text" id="upload-title" placeholder="Örn: Gece Turu">
+    </div>
+    <div class="form-group">
+      <label>Tarih</label>
+      <input type="date" id="upload-date">
+    </div>
+
+    <button class="btn" id="upload-btn" onclick="doUpload()">YÜKLE VE YAYINLA</button>
+    <div class="progress-bar" id="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="error" id="upload-error"></div>
+    <div class="success" id="upload-success"></div>
+
+    <span class="back-link" onclick="showConfigScreen()">⚙ Ayarları Değiştir</span>
+    <a href="../galeri.html" class="back-link" style="margin-top:.5rem">← Galeriye Dön</a>
   </div>
-  <div class="form-group">
-    <label>GitHub Repo Adı</label>
-    <input type="text" id="cfg-repo" placeholder="örn: scorpionmc">
-  </div>
 
-  <button class="btn" onclick="saveConfig()">KAYDET VE DEVAM ET</button>
-  <div class="error" id="config-error">Tüm alanları doldurun!</div>
-</div>
+  <script>
+    const ADMIN_PASS = "scorpion123"; // ← Buradan şifreyi değiştir
 
-<!-- EKRAN 3: YÜKLEME -->
-<div class="screen" id="screen-upload">
-  <div class="step-indicator"><div class="step"></div><div class="step"></div><div class="step active"></div></div>
-  <h1>FOTOĞRAF EKLE</h1>
-  <p class="subtitle">GALERİYE YENİ FOTOĞRAF EKLE</p>
+    // ---- EKRAN YÖNETİMİ ----
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
 
-  <div class="config-summary" id="config-summary"></div>
+    // ---- GİRİŞ ----
+    function doLogin() {
+      const pass = document.getElementById('login-pass').value;
+      if (pass === ADMIN_PASS) {
+        document.getElementById('login-error').style.display = 'none';
+        sessionStorage.setItem('smc_admin', '1');
+        const cfg = getConfig();
+        if (!cfg.cloudName || !cfg.preset || !cfg.token || !cfg.owner || !cfg.repo) {
+          showScreen('screen-config');
+        } else {
+          showUploadScreen();
+        }
+      } else {
+        const err = document.getElementById('login-error');
+        err.style.display = 'block';
+        err.textContent = 'Yanlış şifre!';
+      }
+    }
 
-  <img class="preview-img" id="preview" src="" alt="Önizleme">
+    document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
-  <div class="form-group">
-    <label>Fotoğraf Seç</label>
-    <input type="file" id="upload-file" accept="image/*" onchange="previewFile(this)">
-  </div>
-  <div class="form-group">
-    <label>Başlık</label>
-    <input type="text" id="upload-title" placeholder="Örn: Gece Turu">
-  </div>
-  <div class="form-group">
-    <label>Tarih</label>
-    <input type="date" id="upload-date">
-  </div>
+    // ---- CONFIG ----
+    function getConfig() {
+      return {
+        cloudName: localStorage.getItem('smc_cloud') || '',
+        preset: localStorage.getItem('smc_preset') || '',
+        token: localStorage.getItem('smc_token') || '',
+        owner: localStorage.getItem('smc_owner') || '',
+        repo: localStorage.getItem('smc_repo') || ''
+      };
+    }
 
-  <button class="btn" id="upload-btn" onclick="doUpload()">YÜKLE VE YAYINLA</button>
-  <div class="progress-bar" id="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-  <div class="error" id="upload-error"></div>
-  <div class="success" id="upload-success"></div>
-
-  <span class="back-link" onclick="showConfigScreen()">⚙ Ayarları Değiştir</span>
-  <a href="../galeri.html" class="back-link" style="margin-top:.5rem">← Galeriye Dön</a>
-</div>
-
-<script>
-const ADMIN_PASS = "scorpion123"; // ← Buradan şifreyi değiştir
-
-// ---- EKRAN YÖNETİMİ ----
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-// ---- GİRİŞ ----
-function doLogin() {
-  const pass = document.getElementById('login-pass').value;
-  if (pass === ADMIN_PASS) {
-    document.getElementById('login-error').style.display = 'none';
-    sessionStorage.setItem('smc_admin', '1');
-    const cfg = getConfig();
-    if (!cfg.cloudName || !cfg.preset || !cfg.token || !cfg.owner || !cfg.repo) {
-      showScreen('screen-config');
-    } else {
+    function saveConfig() {
+      const cloud = document.getElementById('cfg-cloud').value.trim();
+      const preset = document.getElementById('cfg-preset').value.trim();
+      const token = document.getElementById('cfg-token').value.trim();
+      const owner = document.getElementById('cfg-owner').value.trim();
+      const repo = document.getElementById('cfg-repo').value.trim();
+      if (!cloud || !preset || !token || !owner || !repo) {
+        document.getElementById('config-error').style.display = 'block';
+        return;
+      }
+      localStorage.setItem('smc_cloud', cloud);
+      localStorage.setItem('smc_preset', preset);
+      localStorage.setItem('smc_token', token);
+      localStorage.setItem('smc_owner', owner);
+      localStorage.setItem('smc_repo', repo);
       showUploadScreen();
     }
-  } else {
-    const err = document.getElementById('login-error');
-    err.style.display = 'block';
-    err.textContent = 'Yanlış şifre!';
-  }
-}
 
-document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+    function showConfigScreen() {
+      const cfg = getConfig();
+      if (cfg.cloudName) document.getElementById('cfg-cloud').value = cfg.cloudName;
+      if (cfg.preset) document.getElementById('cfg-preset').value = cfg.preset;
+      if (cfg.token) document.getElementById('cfg-token').value = cfg.token;
+      if (cfg.owner) document.getElementById('cfg-owner').value = cfg.owner;
+      if (cfg.repo) document.getElementById('cfg-repo').value = cfg.repo;
+      showScreen('screen-config');
+    }
 
-// ---- CONFIG ----
-function getConfig() {
-  return {
-    cloudName: localStorage.getItem('smc_cloud') || '',
-    preset: localStorage.getItem('smc_preset') || '',
-    token: localStorage.getItem('smc_token') || '',
-    owner: localStorage.getItem('smc_owner') || '',
-    repo: localStorage.getItem('smc_repo') || ''
-  };
-}
+    function showUploadScreen() {
+      const cfg = getConfig();
+      document.getElementById('config-summary').innerHTML =
+        `<strong>Cloud:</strong> ${cfg.cloudName} &nbsp;|&nbsp; <strong>Repo:</strong> ${cfg.owner}/${cfg.repo}`;
+      // Bugünün tarihi
+      document.getElementById('upload-date').value = new Date().toISOString().split('T')[0];
+      showScreen('screen-upload');
+    }
 
-function saveConfig() {
-  const cloud = document.getElementById('cfg-cloud').value.trim();
-  const preset = document.getElementById('cfg-preset').value.trim();
-  const token = document.getElementById('cfg-token').value.trim();
-  const owner = document.getElementById('cfg-owner').value.trim();
-  const repo = document.getElementById('cfg-repo').value.trim();
-  if (!cloud || !preset || !token || !owner || !repo) {
-    document.getElementById('config-error').style.display = 'block';
-    return;
-  }
-  localStorage.setItem('smc_cloud', cloud);
-  localStorage.setItem('smc_preset', preset);
-  localStorage.setItem('smc_token', token);
-  localStorage.setItem('smc_owner', owner);
-  localStorage.setItem('smc_repo', repo);
-  showUploadScreen();
-}
+    // ---- ÖNIZLEME ----
+    function previewFile(input) {
+      const preview = document.getElementById('preview');
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
 
-function showConfigScreen() {
-  const cfg = getConfig();
-  if (cfg.cloudName) document.getElementById('cfg-cloud').value = cfg.cloudName;
-  if (cfg.preset) document.getElementById('cfg-preset').value = cfg.preset;
-  if (cfg.token) document.getElementById('cfg-token').value = cfg.token;
-  if (cfg.owner) document.getElementById('cfg-owner').value = cfg.owner;
-  if (cfg.repo) document.getElementById('cfg-repo').value = cfg.repo;
-  showScreen('screen-config');
-}
+    // ---- PROGRESS ----
+    function setProgress(pct, label) {
+      const bar = document.getElementById('progress-bar');
+      const fill = document.getElementById('progress-fill');
+      bar.style.display = 'block';
+      fill.style.width = pct + '%';
+    }
 
-function showUploadScreen() {
-  const cfg = getConfig();
-  document.getElementById('config-summary').innerHTML =
-    `<strong>Cloud:</strong> ${cfg.cloudName} &nbsp;|&nbsp; <strong>Repo:</strong> ${cfg.owner}/${cfg.repo}`;
-  // Bugünün tarihi
-  document.getElementById('upload-date').value = new Date().toISOString().split('T')[0];
-  showScreen('screen-upload');
-}
+    function showMsg(type, msg) {
+      const el = document.getElementById('upload-' + type);
+      el.textContent = msg;
+      el.style.display = 'block';
+      setTimeout(() => { el.style.display = 'none'; }, 6000);
+    }
 
-// ---- ÖNIZLEME ----
-function previewFile(input) {
-  const preview = document.getElementById('preview');
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
+    // ---- CLOUDINARY UPLOAD ----
+    async function uploadToCloudinary(file, cloudName, preset) {
+      const fd = new FormData();
 
-// ---- PROGRESS ----
-function setProgress(pct, label) {
-  const bar = document.getElementById('progress-bar');
-  const fill = document.getElementById('progress-fill');
-  bar.style.display = 'block';
-  fill.style.width = pct + '%';
-}
+      console.log("Sistemin okuduğu Cloud Name:", cloudName);
+      console.log("Sistemin okuduğu Preset:", preset);
 
-function showMsg(type, msg) {
-  const el = document.getElementById('upload-' + type);
-  el.textContent = msg;
-  el.style.display = 'block';
-  setTimeout(() => { el.style.display = 'none'; }, 6000);
-}
+      fd.append('file', file);
+      fd.append('upload_preset', preset);
+      fd.append('folder', 'scorpionmc');
 
-// ---- CLOUDINARY UPLOAD ----
-async function uploadToCloudinary(file, cloudName, preset) {
-  const fd = new FormData();
-  fd.append('file', file);
-  fd.append('upload_preset', preset);
-  fd.append('folder', 'scorpionmc');
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-    method: 'POST', body: fd
-  });
-  if (!res.ok) throw new Error('Cloudinary yükleme hatası: ' + res.status);
-  const data = await res.json();
-  return data.secure_url;
-}
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body: fd
+      });
 
-// ---- GITHUB: gallery_data.json OKU ----
-async function getGalleryData(token, owner, repo) {
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/assets/gallery_data.json`;
-  const res = await fetch(url, { headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' } });
-  if (!res.ok) throw new Error('GitHub okuma hatası: ' + res.status + ' — Token ve repo adını kontrol et');
-  const meta = await res.json();
-  const content = JSON.parse(atob(meta.content.replace(/\n/g, '')));
-  return { data: content, sha: meta.sha };
-}
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Cloudinary Hata Detayı:", errorData);
+        throw new Error('Cloudinary yükleme hatası: ' + res.status);
+      }
 
-// ---- GITHUB: gallery_data.json GÜNCELLE ----
-async function pushGalleryData(token, owner, repo, newData, sha) {
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/assets/gallery_data.json`;
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(newData, null, 2))));
-  const res = await fetch(url, {
-    method: 'PUT',
-    headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json', Accept: 'application/vnd.github.v3+json' },
-    body: JSON.stringify({ message: `Galeri: yeni fotoğraf eklendi — ${newData[0].title}`, content: encoded, sha })
-  });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error('GitHub push hatası: ' + (err.message || res.status));
-  }
-}
+      const data = await res.json();
+      return data.secure_url;
+    }
 
-// ---- ANA YÜKLEME FONKSİYONU ----
-async function doUpload() {
-  const file = document.getElementById('upload-file').files[0];
-  const title = document.getElementById('upload-title').value.trim();
-  const date = document.getElementById('upload-date').value;
-  document.getElementById('upload-error').style.display = 'none';
-  document.getElementById('upload-success').style.display = 'none';
+    // ---- GITHUB: gallery_data.json OKU ----
+    async function getGalleryData(token, owner, repo) {
+      const url = `https://api.github.com/repos/${owner}/${repo}/contents/assets/gallery_data.json`;
+      const res = await fetch(url, { headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' } });
+      if (!res.ok) throw new Error('GitHub okuma hatası: ' + res.status + ' — Token ve repo adını kontrol et');
+      const meta = await res.json();
+      const content = JSON.parse(atob(meta.content.replace(/\n/g, '')));
+      return { data: content, sha: meta.sha };
+    }
 
-  if (!file || !title || !date) { showMsg('error', 'Fotoğraf, başlık ve tarih zorunludur!'); return; }
+    // ---- GITHUB: gallery_data.json GÜNCELLE ----
+    async function pushGalleryData(token, owner, repo, newData, sha) {
+      const url = `https://api.github.com/repos/${owner}/${repo}/contents/assets/gallery_data.json`;
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(newData, null, 2))));
+      const res = await fetch(url, {
+        method: 'PUT',
+        headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json', Accept: 'application/vnd.github.v3+json' },
+        body: JSON.stringify({ message: `Galeri: yeni fotoğraf eklendi — ${newData[0].title}`, content: encoded, sha })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error('GitHub push hatası: ' + (err.message || res.status));
+      }
+    }
 
-  const cfg = getConfig();
-  const btn = document.getElementById('upload-btn');
-  btn.disabled = true;
-  btn.textContent = 'YÜKLENIYOR...';
+    // ---- ANA YÜKLEME FONKSİYONU ----
+    async function doUpload() {
+      const file = document.getElementById('upload-file').files[0];
+      const title = document.getElementById('upload-title').value.trim();
+      const date = document.getElementById('upload-date').value;
+      document.getElementById('upload-error').style.display = 'none';
+      document.getElementById('upload-success').style.display = 'none';
 
-  try {
-    // 1. Cloudinary'e yükle
-    setProgress(20, 'Fotoğraf yükleniyor...');
-    const imgUrl = await uploadToCloudinary(file, cfg.cloudName, cfg.preset);
-    setProgress(50, 'Galeri verisi güncelleniyor...');
+      if (!file || !title || !date) { showMsg('error', 'Fotoğraf, başlık ve tarih zorunludur!'); return; }
 
-    // 2. GitHub'dan mevcut gallery_data.json oku
-    const { data: galleryArr, sha } = await getGalleryData(cfg.token, cfg.owner, cfg.repo);
-    setProgress(75, 'GitHub\'a gönderiliyor...');
+      const cfg = getConfig();
+      const btn = document.getElementById('upload-btn');
+      btn.disabled = true;
+      btn.textContent = 'YÜKLENIYOR...';
 
-    // 3. Yeni fotoğrafı BAŞA ekle
-    galleryArr.unshift({ src: imgUrl, title, date });
+      try {
+        // 1. Cloudinary'e yükle
+        setProgress(20, 'Fotoğraf yükleniyor...');
+        const imgUrl = await uploadToCloudinary(file, cfg.cloudName, cfg.preset);
+        setProgress(50, 'Galeri verisi güncelleniyor...');
 
-    // 4. GitHub'a push et
-    await pushGalleryData(cfg.token, cfg.owner, cfg.repo, galleryArr, sha);
-    setProgress(100);
+        // 2. GitHub'dan mevcut gallery_data.json oku
+        const { data: galleryArr, sha } = await getGalleryData(cfg.token, cfg.owner, cfg.repo);
+        setProgress(75, 'GitHub\'a gönderiliyor...');
 
-    // 5. Başarı
-    showMsg('success', `✓ "${title}" galeriye eklendi ve GitHub'a gönderildi! Site ~1 dk içinde güncellenecek.`);
-    document.getElementById('upload-file').value = '';
-    document.getElementById('upload-title').value = '';
-    document.getElementById('preview').style.display = 'none';
-    document.getElementById('upload-date').value = new Date().toISOString().split('T')[0];
-    setTimeout(() => { document.getElementById('progress-bar').style.display = 'none'; }, 2000);
+        // 3. Yeni fotoğrafı BAŞA ekle
+        galleryArr.unshift({ src: imgUrl, title, date });
 
-  } catch (e) {
-    showMsg('error', e.message);
-    document.getElementById('progress-bar').style.display = 'none';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'YÜKLE VE YAYINLA';
-  }
-}
+        // 4. GitHub'a push et
+        await pushGalleryData(cfg.token, cfg.owner, cfg.repo, galleryArr, sha);
+        setProgress(100);
 
-// ---- BAŞLANGIÇ ----
-window.onload = () => {
-  if (sessionStorage.getItem('smc_admin') === '1') {
-    const cfg = getConfig();
-    if (!cfg.cloudName || !cfg.token) showScreen('screen-config');
-    else showUploadScreen();
-  } else {
-    showScreen('screen-login');
-  }
-};
-</script>
+        // 5. Başarı
+        showMsg('success', `✓ "${title}" galeriye eklendi ve GitHub'a gönderildi! Site ~1 dk içinde güncellenecek.`);
+        document.getElementById('upload-file').value = '';
+        document.getElementById('upload-title').value = '';
+        document.getElementById('preview').style.display = 'none';
+        document.getElementById('upload-date').value = new Date().toISOString().split('T')[0];
+        setTimeout(() => { document.getElementById('progress-bar').style.display = 'none'; }, 2000);
+
+      } catch (e) {
+        showMsg('error', e.message);
+        document.getElementById('progress-bar').style.display = 'none';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'YÜKLE VE YAYINLA';
+      }
+    }
+
+    // ---- BAŞLANGIÇ ----
+    window.onload = () => {
+      if (sessionStorage.getItem('smc_admin') === '1') {
+        const cfg = getConfig();
+        if (!cfg.cloudName || !cfg.token) showScreen('screen-config');
+        else showUploadScreen();
+      } else {
+        showScreen('screen-login');
+      }
+    };
+  </script>
 </body>
+
 </html>
