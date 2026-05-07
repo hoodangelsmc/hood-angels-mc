@@ -3,6 +3,14 @@
    Mevcut kodları bozmadan eklenen animasyonlar
    ============================================= */
 
+@font-face {
+    font-family: 'Hessian';
+    src: url('Hessian.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
 /* ---- Keyframe Tanımları ---- */
 
 /* Yumuşak parlama efekti */

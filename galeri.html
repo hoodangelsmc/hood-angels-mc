@@ -160,35 +160,25 @@
             <p class="reveal">Karanlık Sokaklardan Kareler</p>
         </div>
 
-        <div class="gallery-container">
-            <!-- Sample images (User should replace with real ones) -->
-            <div class="gallery-item reveal"><img src="assets/foto1.png" alt="Biker 1"></div>
-            <div class="gallery-item reveal"><img src="assets/foto2.webp" alt="Biker 2"></div>
-            <div class="gallery-item reveal"><img src="assets/foto3.webp" alt="Biker 3"></div>
-            <div class="gallery-item reveal"><img src="assets/foto4.webp" alt="Biker 4"></div>
-            <div class="gallery-item reveal"><img src="assets/foto5.webp" alt="Biker 5"></div>
-            <div class="gallery-item reveal"><img src="assets/foto6.webp" alt="Biker 6"></div>
-            <div class="gallery-item reveal"><img src="assets/foto7.webp" alt="Biker 7"></div>
-            <div class="gallery-item reveal"><img src="assets/foto8.png" alt="Biker 8"></div>
-            <div class="gallery-item reveal"><img src="assets/foto9.png" alt="Biker 9"></div>
-            <div class="gallery-item reveal"><img src="assets/foto10.png" alt="Biker 10"></div>
-            <div class="gallery-item reveal"><img src="assets/foto11.png" alt="Biker 11"></div>
-            <div class="gallery-item reveal"><img src="assets/foto12.png" alt="Biker 12"></div>
-            <div class="gallery-item reveal"><img src="assets/foto13.png" alt="Biker 13"></div>
-            <div class="gallery-item reveal"><img src="assets/foto14.png" alt="Biker 14"></div>
-            <div class="gallery-item reveal"><img src="assets/foto15.png" alt="Biker 15"></div>
-            <div class="gallery-item reveal"><img src="assets/foto16.png" alt="Biker 16"></div>
-            <div class="gallery-item reveal"><img src="assets/foto19.webp" alt="Biker 19"></div>
-            <div class="gallery-item reveal"><img src="assets/foto20.webp" alt="Biker 20"></div>
-            <div class="gallery-item reveal"><img src="assets/foto21.webp" alt="Biker 21"></div>
-            <div class="gallery-item reveal"><img src="assets/foto22.webp" alt="Biker 22"></div>
-            <div class="gallery-item reveal"><img src="assets/foto23.png" alt="Biker 23"></div>
+        <div class="gallery-container" id="gallery-wrapper">
+            <!-- Fotoğraflar JS ile yüklenecek -->
         </div>  
     </main>
 
+    <!-- Admin Ekleme Butonu (Sadece giriş yapılmışsa görünecek) -->
+    <a href="admin/dashboard.php" id="admin-add-btn" style="display: none; position: fixed; bottom: 40px; right: 40px; width: 70px; height: 70px; background: #fff; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; text-decoration: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2100; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+        +
+    </a>
+
     <div id="lightbox">
         <span class="close-lightbox">&times;</span>
-        <img id="lightbox-img" src="" alt="Full View">
+        <div style="text-align: center; width: 100%;">
+            <img id="lightbox-img" src="" alt="Full View">
+            <div id="lightbox-info" style="margin-top: 2rem; color: #fff; font-family: 'Hessian', serif;">
+                <h3 id="lightbox-title" style="font-size: 2.5rem; letter-spacing: 5px; margin-bottom: 0.5rem;"></h3>
+                <p id="lightbox-date" style="color: #888; letter-spacing: 3px; font-size: 1rem;"></p>
+            </div>
+        </div>
     </div>
 
     <footer>
@@ -199,20 +189,74 @@
     </footer>
 
     <script>
+        // Galeri verilerini yükle
+        async function loadGallery() {
+            try {
+                const response = await fetch('assets/gallery_data.json');
+                const data = await response.json();
+                const wrapper = document.getElementById('gallery-wrapper');
+                
+                wrapper.innerHTML = '';
+                
+                data.forEach(item => {
+                    const galleryItem = document.createElement('div');
+                    galleryItem.className = 'gallery-item reveal';
+                    galleryItem.innerHTML = `<img src="${item.src}" alt="${item.title}" data-title="${item.title}" data-date="${item.date}">`;
+                    
+                    galleryItem.addEventListener('click', () => {
+                        openLightbox(item.src, item.title, item.date);
+                    });
+                    
+                    wrapper.appendChild(galleryItem);
+                });
+
+                // Intersection Observer'ı yeniden başlat (animations.js içindeki observer'ı tetikler)
+                if (window.observer) {
+                    document.querySelectorAll('.reveal').forEach(el => window.observer.observe(el));
+                } else {
+                    // Fallback
+                    const localObserver = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) entry.target.classList.add('visible');
+                        });
+                    }, { threshold: 0.1 });
+                    document.querySelectorAll('.reveal').forEach(el => localObserver.observe(el));
+                }
+
+            } catch (error) {
+                console.error("Galeri yüklenirken hata:", error);
+            }
+        }
+
+        // Admin kontrolü
+        async function checkAdmin() {
+            try {
+                const response = await fetch('admin/check_auth.php');
+                const data = await response.json();
+                if (data.logged_in) {
+                    document.getElementById('admin-add-btn').style.display = 'flex';
+                } else {
+                    document.getElementById('admin-add-btn').style.display = 'none';
+                }
+            } catch (e) {
+                document.getElementById('admin-add-btn').style.display = 'none';
+            }
+        }
+
         // Lightbox logic
-        const galleryItems = document.querySelectorAll('.gallery-item');
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxTitle = document.getElementById('lightbox-title');
+        const lightboxDate = document.getElementById('lightbox-date');
         const closeBtn = document.querySelector('.close-lightbox');
 
-        galleryItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const imgSrc = item.querySelector('img').src;
-                lightboxImg.src = imgSrc;
-                lightbox.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            });
-        });
+        function openLightbox(src, title, date) {
+            lightboxImg.src = src;
+            lightboxTitle.textContent = title || "";
+            lightboxDate.textContent = date || "";
+            lightbox.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
 
         closeBtn.addEventListener('click', () => {
             lightbox.style.display = 'none';
@@ -220,19 +264,18 @@
         });
 
         lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox) closeBtn.click();
+            if (e.target === lightbox || e.target.parentElement === lightbox) closeBtn.click();
         });
 
-        // Intersection Observer for reveal animation
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1 });
+        // Başlat
+        loadGallery();
+        checkAdmin();
 
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        // Admin butonu hover animasyonu
+        const adminBtn = document.getElementById('admin-add-btn');
+        adminBtn.onmouseover = () => { adminBtn.style.transform = 'scale(1.1) translateY(-5px)'; adminBtn.style.boxShadow = '0 15px 40px rgba(255,255,255,0.1)'; };
+        adminBtn.onmouseout = () => { adminBtn.style.transform = 'scale(1) translateY(0)'; adminBtn.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)'; };
+
     </script>
   <script crossorigin id="vite-legacy-polyfill" src="./assets/polyfills-legacy-XJe6vqej.js"></script>
   <script crossorigin id="vite-legacy-entry" data-src="./assets/galeri-legacy-XDi4Fj-j.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
