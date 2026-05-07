@@ -165,18 +165,18 @@
         </div>  
     </main>
 
-    <!-- Admin Ekleme Butonu (Sadece giriş yapılmışsa görünecek) -->
-    <a href="admin/dashboard.php" id="admin-add-btn" style="display: none; position: fixed; bottom: 40px; right: 40px; width: 70px; height: 70px; background: #fff; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; text-decoration: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2100; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+    <!-- Admin + Butonu (Sadece admin panelinden giriş yapılmışsa görünür) -->
+    <a href="admin/index.html" id="admin-add-btn" style="display:none;position:fixed;bottom:40px;right:40px;width:70px;height:70px;background:#fff;color:#000;border-radius:50%;align-items:center;justify-content:center;font-size:3rem;text-decoration:none;box-shadow:0 10px 30px rgba(0,0,0,0.5);z-index:2100;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);font-family:'Hessian',serif;line-height:1">
         +
     </a>
 
     <div id="lightbox">
         <span class="close-lightbox">&times;</span>
-        <div style="text-align: center; width: 100%;">
+        <div style="text-align:center;width:100%">
             <img id="lightbox-img" src="" alt="Full View">
-            <div id="lightbox-info" style="margin-top: 2rem; color: #fff; font-family: 'Hessian', serif;">
-                <h3 id="lightbox-title" style="font-size: 2.5rem; letter-spacing: 5px; margin-bottom: 0.5rem;"></h3>
-                <p id="lightbox-date" style="color: #888; letter-spacing: 3px; font-size: 1rem;"></p>
+            <div id="lightbox-info" style="margin-top:2rem;color:#fff;font-family:'Hessian',serif">
+                <h3 id="lightbox-title" style="font-size:2.5rem;letter-spacing:5px;margin-bottom:.5rem"></h3>
+                <p id="lightbox-date" style="color:#888;letter-spacing:3px;font-size:1rem"></p>
             </div>
         </div>
     </div>
@@ -189,96 +189,67 @@
     </footer>
 
     <script>
-        // Galeri verilerini yükle
+        // Galeri verilerini yükle (gallery_data.json — hem Cloudinary URL hem local path destekler)
         async function loadGallery() {
+            const wrapper = document.getElementById('gallery-wrapper');
             try {
-                const response = await fetch('assets/gallery_data.json');
-                const data = await response.json();
-                const wrapper = document.getElementById('gallery-wrapper');
-                
+                // Cache-busting: GitHub Pages'da güncel JSON'u al
+                const res = await fetch('assets/gallery_data.json?t=' + Date.now());
+                if (!res.ok) throw new Error('JSON okunamadı');
+                const data = await res.json();
                 wrapper.innerHTML = '';
-                
                 data.forEach(item => {
-                    const galleryItem = document.createElement('div');
-                    galleryItem.className = 'gallery-item reveal';
-                    galleryItem.innerHTML = `<img src="${item.src}" alt="${item.title}" data-title="${item.title}" data-date="${item.date}">`;
-                    
-                    galleryItem.addEventListener('click', () => {
-                        openLightbox(item.src, item.title, item.date);
-                    });
-                    
-                    wrapper.appendChild(galleryItem);
+                    const div = document.createElement('div');
+                    div.className = 'gallery-item reveal';
+                    div.innerHTML = `<img src="${item.src}" alt="${item.title || ''}">`;
+                    div.addEventListener('click', () => openLightbox(item.src, item.title, item.date));
+                    wrapper.appendChild(div);
                 });
-
-                // Intersection Observer'ı yeniden başlat (animations.js içindeki observer'ı tetikler)
-                if (window.observer) {
-                    document.querySelectorAll('.reveal').forEach(el => window.observer.observe(el));
-                } else {
-                    // Fallback
-                    const localObserver = new IntersectionObserver((entries) => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting) entry.target.classList.add('visible');
-                        });
-                    }, { threshold: 0.1 });
-                    document.querySelectorAll('.reveal').forEach(el => localObserver.observe(el));
-                }
-
-            } catch (error) {
-                console.error("Galeri yüklenirken hata:", error);
-            }
-        }
-
-        // Admin kontrolü
-        async function checkAdmin() {
-            try {
-                const response = await fetch('admin/check_auth.php');
-                const data = await response.json();
-                if (data.logged_in) {
-                    document.getElementById('admin-add-btn').style.display = 'flex';
-                } else {
-                    document.getElementById('admin-add-btn').style.display = 'none';
-                }
             } catch (e) {
-                document.getElementById('admin-add-btn').style.display = 'none';
+                console.error('Galeri yüklenemedi:', e);
+                wrapper.innerHTML = '<p style="color:#555;text-align:center;padding:4rem;letter-spacing:2px">Fotoğraflar yüklenemedi.</p>';
+            }
+            // Reveal observer
+            const obs = new IntersectionObserver(entries => {
+                entries.forEach(en => { if (en.isIntersecting) en.target.classList.add('visible'); });
+            }, { threshold: 0.08 });
+            document.querySelectorAll('.gallery-item.reveal').forEach(el => obs.observe(el));
+        }
+
+        // Admin butonunu sessionStorage ile kontrol et (PHP yok)
+        function checkAdmin() {
+            if (sessionStorage.getItem('smc_admin') === '1') {
+                document.getElementById('admin-add-btn').style.display = 'flex';
             }
         }
 
-        // Lightbox logic
+        // Lightbox
         const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightbox-img');
-        const lightboxTitle = document.getElementById('lightbox-title');
-        const lightboxDate = document.getElementById('lightbox-date');
         const closeBtn = document.querySelector('.close-lightbox');
 
         function openLightbox(src, title, date) {
-            lightboxImg.src = src;
-            lightboxTitle.textContent = title || "";
-            lightboxDate.textContent = date || "";
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox-title').textContent = title || '';
+            document.getElementById('lightbox-date').textContent = date || '';
             lightbox.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
 
-        closeBtn.addEventListener('click', () => {
-            lightbox.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        });
+        closeBtn.addEventListener('click', () => { lightbox.style.display = 'none'; document.body.style.overflow = 'auto'; });
+        lightbox.addEventListener('click', e => { if (e.target === lightbox) closeBtn.click(); });
 
-        lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox || e.target.parentElement === lightbox) closeBtn.click();
-        });
+        // Admin buton hover
+        const adminBtn = document.getElementById('admin-add-btn');
+        adminBtn.onmouseover = () => { adminBtn.style.transform = 'scale(1.1) translateY(-5px)'; };
+        adminBtn.onmouseout = () => { adminBtn.style.transform = 'scale(1) translateY(0)'; };
 
         // Başlat
         loadGallery();
         checkAdmin();
-
-        // Admin butonu hover animasyonu
-        const adminBtn = document.getElementById('admin-add-btn');
-        adminBtn.onmouseover = () => { adminBtn.style.transform = 'scale(1.1) translateY(-5px)'; adminBtn.style.boxShadow = '0 15px 40px rgba(255,255,255,0.1)'; };
-        adminBtn.onmouseout = () => { adminBtn.style.transform = 'scale(1) translateY(0)'; adminBtn.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)'; };
-
     </script>
   <script crossorigin id="vite-legacy-polyfill" src="./assets/polyfills-legacy-XJe6vqej.js"></script>
   <script crossorigin id="vite-legacy-entry" data-src="./assets/galeri-legacy-XDi4Fj-j.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
   <script src="./assets/animations.js" defer></script>
 </body>
 </html>
+

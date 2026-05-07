@@ -1,23 +1,112 @@
 [
-    {"src": "assets/foto1.png", "title": "Biker 1", "date": "2025-05-01"},
-    {"src": "assets/foto2.webp", "title": "Biker 2", "date": "2025-05-01"},
-    {"src": "assets/foto3.webp", "title": "Biker 3", "date": "2025-05-01"},
-    {"src": "assets/foto4.webp", "title": "Biker 4", "date": "2025-05-01"},
-    {"src": "assets/foto5.webp", "title": "Biker 5", "date": "2025-05-01"},
-    {"src": "assets/foto6.webp", "title": "Biker 6", "date": "2025-05-01"},
-    {"src": "assets/foto7.webp", "title": "Biker 7", "date": "2025-05-01"},
-    {"src": "assets/foto8.png", "title": "Biker 8", "date": "2025-05-01"},
-    {"src": "assets/foto9.png", "title": "Biker 9", "date": "2025-05-01"},
-    {"src": "assets/foto10.png", "title": "Biker 10", "date": "2025-05-01"},
-    {"src": "assets/foto11.png", "title": "Biker 11", "date": "2025-05-01"},
-    {"src": "assets/foto12.png", "title": "Biker 12", "date": "2025-05-01"},
-    {"src": "assets/foto13.png", "title": "Biker 13", "date": "2025-05-01"},
-    {"src": "assets/foto14.png", "title": "Biker 14", "date": "2025-05-01"},
-    {"src": "assets/foto15.png", "title": "Biker 15", "date": "2025-05-01"},
-    {"src": "assets/foto16.png", "title": "Biker 16", "date": "2025-05-01"},
-    {"src": "assets/foto19.webp", "title": "Biker 19", "date": "2025-05-01"},
-    {"src": "assets/foto20.webp", "title": "Biker 20", "date": "2025-05-01"},
-    {"src": "assets/foto21.webp", "title": "Biker 21", "date": "2025-05-01"},
-    {"src": "assets/foto22.webp", "title": "Biker 22", "date": "2025-05-01"},
-    {"src": "assets/foto23.png", "title": "Biker 23", "date": "2025-05-01"}
+    {
+        "src": "assets\/upload_1778192211.webp",
+        "title": "Kl\u00fcp",
+        "date": "2026-05-08"
+    },
+    {
+        "src": "assets\/foto1.png",
+        "title": "Biker 1",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto2.webp",
+        "title": "Biker 2",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto3.webp",
+        "title": "Biker 3",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto4.webp",
+        "title": "Biker 4",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto5.webp",
+        "title": "Biker 5",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto6.webp",
+        "title": "Biker 6",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto7.webp",
+        "title": "Biker 7",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto8.png",
+        "title": "Biker 8",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto9.png",
+        "title": "Biker 9",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto10.png",
+        "title": "Biker 10",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto11.png",
+        "title": "Biker 11",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto12.png",
+        "title": "Biker 12",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto13.png",
+        "title": "Biker 13",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto14.png",
+        "title": "Biker 14",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto15.png",
+        "title": "Biker 15",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto16.png",
+        "title": "Biker 16",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto19.webp",
+        "title": "Biker 19",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto20.webp",
+        "title": "Biker 20",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto21.webp",
+        "title": "Biker 21",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto22.webp",
+        "title": "Biker 22",
+        "date": "2025-05-01"
+    },
+    {
+        "src": "assets\/foto23.png",
+        "title": "Biker 23",
+        "date": "2025-05-01"
+    }
 ]
