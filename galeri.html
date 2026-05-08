@@ -193,8 +193,8 @@
         async function loadGallery() {
             const wrapper = document.getElementById('gallery-wrapper');
             try {
-                // Cache-busting: GitHub Pages'da güncel JSON'u al
-                const res = await fetch('assets/gallery_data.json?t=' + Date.now());
+                // GitHub Pages'ın dağıtım gecikmesini (1-2 dk) aşmak için doğrudan GitHub ham verisini çekiyoruz
+                const res = await fetch('https://raw.githubusercontent.com/scorpionsmc/scorpionmc/main/assets/gallery_data.json?t=' + Date.now());
                 if (!res.ok) throw new Error('JSON okunamadı');
                 const data = await res.json();
                 wrapper.innerHTML = '';
