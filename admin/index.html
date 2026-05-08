@@ -336,7 +336,14 @@
       });
       if (!res.ok) throw new Error('GitHub Hatası');
       const meta = await res.json();
-      const content = JSON.parse(decodeURIComponent(escape(atob(meta.content.replace(/\n/g, '')))));
+      let rawContent = decodeURIComponent(escape(atob(meta.content.replace(/\n/g, ''))));
+      
+      // UTF-8 BOM (ï»¿) temizleme koruması
+      if (rawContent.charCodeAt(0) === 0xFEFF) {
+        rawContent = rawContent.slice(1);
+      }
+      
+      const content = JSON.parse(rawContent);
       return { data: content, sha: meta.sha };
     }
 
