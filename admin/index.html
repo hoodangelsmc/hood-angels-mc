@@ -1005,9 +1005,16 @@
 
     async function getGalleryData(token, owner, repo) {
 
-      const url = `https://api.github.com/repos/${owner}/${repo}/contents/assets/gallery_data.json`;
+      // Cache-busting ekleyerek her zaman en güncel SHA değerini alıyoruz
+      const url = `https://api.github.com/repos/${owner}/${repo}/contents/assets/gallery_data.json?t=${Date.now()}`;
 
-      const res = await fetch(url, { headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' } });
+      const res = await fetch(url, { 
+        headers: { 
+          'Authorization': `token ${token}`, 
+          'Accept': 'application/vnd.github.v3+json',
+          'Cache-Control': 'no-cache'
+        } 
+      });
 
       if (!res.ok) throw new Error('GitHub okuma hatası: ' + res.status + ' — Token ve repo adını kontrol et');
 
@@ -1046,6 +1053,9 @@
       if (!res.ok) {
 
         const err = await res.json();
+        if (res.status === 409) {
+          throw new Error('Senkronizasyon hatası: Galeri verisi başka bir işlem tarafından güncellenmiş. Lütfen sayfayı yenileyip (F5) tekrar deneyin.');
+        }
 
         throw new Error('GitHub push hatası: ' + (err.message || res.status));
 
