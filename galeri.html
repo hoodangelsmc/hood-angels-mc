@@ -214,6 +214,15 @@
                 entries.forEach(en => { if (en.isIntersecting) en.target.classList.add('visible'); });
             }, { threshold: 0.08 });
             document.querySelectorAll('.gallery-item.reveal').forEach(el => obs.observe(el));
+
+            // Kısa sayfalarda veya observer tetiklenmezse diye 1.5 saniye sonra her şeyi görünür yap (Yedek Plan)
+            setTimeout(() => {
+                document.querySelectorAll('.gallery-item.reveal').forEach(el => {
+                    if (!el.classList.contains('visible')) {
+                        el.classList.add('visible');
+                    }
+                });
+            }, 1500);
         }
 
         // Admin butonunu sessionStorage ile kontrol et (PHP yok)
