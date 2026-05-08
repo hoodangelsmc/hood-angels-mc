@@ -470,6 +470,57 @@
 
       margin-right: .5rem
     }
+
+    .admin-gallery-item {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 0.5rem;
+      border-radius: 4px;
+    }
+
+    .admin-gallery-item img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      margin-right: 1rem;
+      border-radius: 4px;
+    }
+
+    .admin-gallery-item-info {
+      flex: 1;
+    }
+
+    .admin-gallery-item-title {
+      font-size: 0.9rem;
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .admin-gallery-item-date {
+      font-size: 0.75rem;
+      color: #888;
+    }
+
+    .delete-btn {
+      background: rgba(255, 77, 77, 0.1);
+      color: #ff4d4d;
+      border: 1px solid rgba(255, 77, 77, 0.3);
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+
+    .delete-btn:hover {
+      background: rgba(255, 77, 77, 0.3);
+    }
   </style>
 
 </head>
@@ -678,6 +729,14 @@
 
     <a href="../galeri.html" class="back-link" style="margin-top:.5rem">← Galeriye Dön</a>
 
+    <hr class="divider">
+
+    <h2 style="font-size: 1.2rem; margin-bottom: 1rem; text-align: center; letter-spacing: 2px;">YÜKLÜ FOTOĞRAFLAR</h2>
+    
+    <div id="admin-gallery-list" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 250px; overflow-y: auto; padding-right: 5px; margin-bottom: 2rem;">
+      <p style="text-align:center; color:#888; font-size:0.85rem;">Yükleniyor...</p>
+    </div>
+
   </div>
 
 
@@ -834,6 +893,8 @@
 
       showScreen('screen-upload');
 
+      loadAdminGallery();
+
     }
 
 
@@ -962,11 +1023,15 @@
 
     // ---- GITHUB: gallery_data.json GÜNCELLE ----
 
-    async function pushGalleryData(token, owner, repo, newData, sha) {
+    async function pushGalleryData(token, owner, repo, newData, sha, actionType = 'add') {
 
       const url = `https://api.github.com/repos/${owner}/${repo}/contents/assets/gallery_data.json`;
 
       const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(newData, null, 2))));
+
+      let commitMsg = 'Galeri güncellendi';
+      if (actionType === 'add' && newData.length > 0) commitMsg = `Galeri: yeni fotoğraf eklendi — ${newData[0].title}`;
+      if (actionType === 'delete') commitMsg = 'Galeri: fotoğraf silindi';
 
       const res = await fetch(url, {
 
@@ -974,7 +1039,7 @@
 
         headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json', Accept: 'application/vnd.github.v3+json' },
 
-        body: JSON.stringify({ message: `Galeri: yeni fotoğraf eklendi — ${newData[0].title}`, content: encoded, sha })
+        body: JSON.stringify({ message: commitMsg, content: encoded, sha })
 
       });
 
@@ -1108,23 +1173,61 @@
 
     };
 
+    async function loadAdminGallery() {
+      const listEl = document.getElementById('admin-gallery-list');
+      listEl.innerHTML = '<p style="text-align:center; color:#888; font-size:0.85rem;">Fotoğraflar yükleniyor...</p>';
+      
+      const cfg = getConfig();
+      if (!cfg.token) {
+        listEl.innerHTML = '<p style="text-align:center; color:#ff4d4d; font-size:0.85rem;">Bağlantı ayarları eksik.</p>';
+        return;
+      }
+
+      try {
+        const { data } = await getGalleryData(cfg.token, cfg.owner, cfg.repo);
+        listEl.innerHTML = '';
+        
+        if (data.length === 0) {
+          listEl.innerHTML = '<p style="text-align:center; color:#888; font-size:0.85rem;">Henüz fotoğraf yüklenmemiş.</p>';
+          return;
+        }
+
+        data.forEach((item, index) => {
+          const div = document.createElement('div');
+          div.className = 'admin-gallery-item';
+          div.innerHTML = `
+            <img src="${item.src}" alt="${item.title}">
+            <div class="admin-gallery-item-info">
+              <div class="admin-gallery-item-title">${item.title}</div>
+              <div class="admin-gallery-item-date">${item.date}</div>
+            </div>
+            <button class="delete-btn" onclick="deleteGalleryItem(${index})">SİL</button>
+          `;
+          listEl.appendChild(div);
+        });
+      } catch (err) {
+        listEl.innerHTML = '<p style="text-align:center; color:#ff4d4d; font-size:0.85rem;">Fotoğraflar alınamadı: ' + err.message + '</p>';
+      }
+    }
+
     async function deleteGalleryItem(index) {
 
       if (!confirm("Bu fotoğrafı galeriden silmek istediğinize emin misiniz?")) return;
 
+      const cfg = getConfig();
+      if (!cfg.token) return alert("Ayarlar bulunamadı!");
 
-
-      const config = JSON.parse(localStorage.getItem('galleryConfig'));
-
-      if (!config) return alert("Ayarlar bulunamadı!");
-
-
+      const btns = document.querySelectorAll('.delete-btn');
+      if(btns[index]) {
+        btns[index].textContent = 'SİLİNİYOR...';
+        btns[index].disabled = true;
+      }
 
       try {
 
         // 1. GitHub'daki mevcut veriyi çek
 
-        const { data, sha } = await getGalleryData(config.githubToken, config.githubUser, config.githubRepo);
+        const { data, sha } = await getGalleryData(cfg.token, cfg.owner, cfg.repo);
 
 
 
@@ -1134,48 +1237,25 @@
 
 
 
-        // 3. Dosyayı GitHub'da güncelle
+        // 3. Dosyayı GitHub'da güncelle (silme işlemi)
 
-        const res = await fetch(`https://api.github.com/repos/${config.githubUser}/${config.githubRepo}/contents/assets/gallery_data.json`, {
-
-          method: 'PUT',
-
-          headers: {
-
-            'Authorization': `token ${config.githubToken}`,
-
-            'Content-Type': 'application/json'
-
-          },
-
-          body: JSON.stringify({
-
-            message: "Fotoğraf silindi",
-
-            content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))),
-
-            sha: sha
-
-          })
-
-        });
+        await pushGalleryData(cfg.token, cfg.owner, cfg.repo, data, sha, 'delete');
 
 
 
-        if (res.ok) {
-
-          alert("Resim başarıyla silindi! Değişiklik 1 dk içinde siteye yansır.");
-
-          location.reload(); // Listeyi güncellemek için sayfayı yenile
-
-        }
+        alert("Resim başarıyla silindi! Değişiklik 1 dk içinde siteye yansır.");
+        loadAdminGallery(); // Sayfayı yenilemeden listeyi tekrar yükle
 
       } catch (err) {
 
         console.error("Silme hatası:", err);
 
-        alert("Silme işlemi başarısız.");
+        alert("Silme işlemi başarısız: " + err.message);
 
+        if(btns[index]) {
+          btns[index].textContent = 'SİL';
+          btns[index].disabled = false;
+        }
       }
 
     }
