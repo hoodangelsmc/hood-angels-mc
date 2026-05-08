@@ -1019,9 +1019,10 @@
       if (!res.ok) throw new Error('GitHub okuma hatası: ' + res.status + ' — Token ve repo adını kontrol et');
 
       const meta = await res.json();
-
-      const content = JSON.parse(atob(meta.content.replace(/\n/g, '')));
-
+      
+      // UTF-8 karakterlerin bozulmaması için decodeURIComponent(escape(atob(...))) kullanıyoruz
+      const content = JSON.parse(decodeURIComponent(escape(atob(meta.content.replace(/\n/g, '')))));
+      
       return { data: content, sha: meta.sha };
 
     }
@@ -1033,7 +1034,8 @@
     async function pushGalleryData(token, owner, repo, newData, sha, actionType = 'add') {
 
       const url = `https://api.github.com/repos/${owner}/${repo}/contents/assets/gallery_data.json`;
-
+      
+      // UTF-8 karakterlerin bozulmaması için btoa(unescape(encodeURIComponent(...))) kullanıyoruz
       const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(newData, null, 2))));
 
       let commitMsg = 'Galeri güncellendi';
