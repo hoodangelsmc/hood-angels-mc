@@ -7,40 +7,126 @@
     <link rel="stylesheet" href="./assets/mobile.css">
     <link rel="stylesheet" href="./assets/animations.css">
     <style>
-        body { background-color: #000; color: #fff; margin: 0; }
-        .gallery-header { text-align: center; margin-bottom: 6rem; padding-top: 8rem; }
-        .gallery-header h1 { font-family: 'Hessian', serif; font-size: 5rem; letter-spacing: 10px; margin-bottom: 1rem; }
-        .gallery-header p { color: #888; letter-spacing: 3px; font-size: 1rem; text-transform: uppercase; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
 
-        .gallery-container {
-            column-count: 3;
-            column-gap: 1.5rem;
+        :root {
+            --bg-dark: #050505;
+            --accent: #ffffff;
+            --text-dim: #888;
+            --transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #fff;
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Nav */
+        #main-nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: var(--transition);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
             max-width: 1400px;
             margin: 0 auto;
-            padding: 0 2rem 8rem 2rem;
+        }
+
+        .logo {
+            font-family: 'Hessian', serif;
+            font-size: 1.8rem;
+            letter-spacing: 5px;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #888;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #fff;
+        }
+
+        .gallery-header {
+            text-align: center;
+            margin-bottom: 5rem;
+            padding-top: 10rem;
+        }
+
+        .gallery-header h1 {
+            font-family: 'Hessian', serif;
+            font-size: 5rem;
+            letter-spacing: 15px;
+            margin-bottom: 1rem;
+            background: linear-gradient(to bottom, #fff, #444);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gallery-header p {
+            color: var(--text-dim);
+            letter-spacing: 5px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        /* Masonry Layout */
+        .gallery-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            column-count: 3;
+            column-gap: 2rem;
+            padding: 0 2rem 10rem 2rem;
         }
 
         .gallery-item {
             break-inside: avoid;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             position: relative;
             overflow: hidden;
-            background: #0a0a0a;
+            background: #111;
             cursor: pointer;
-            transition: all 0.4s ease;
-            border: 1px solid rgba(255,255,255,0.05);
+            transition: var(--transition);
+            border: 1px solid rgba(255,255,255,0.03);
+            border-radius: 4px;
         }
 
         .gallery-item img {
             width: 100%;
             display: block;
-            filter: contrast(1.1) brightness(0.7);
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: contrast(1.1) brightness(0.8) grayscale(0.3);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .gallery-item:hover img {
-            filter: contrast(1.2) brightness(1);
-            transform: scale(1.05);
+            filter: contrast(1.2) brightness(1) grayscale(0);
+            transform: scale(1.03);
         }
 
         .gallery-item::after {
@@ -50,27 +136,35 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: white;
-            font-family: 'Hessian', serif;
-            font-size: 1.2rem;
-            letter-spacing: 4px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 5px;
             opacity: 0;
-            transition: 0.3s;
+            transition: var(--transition);
             z-index: 2;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(5px);
         }
 
-        .gallery-item:hover::after { opacity: 1; }
+        .gallery-item:hover::after {
+            opacity: 1;
+        }
 
         .gallery-item::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.5);
             opacity: 0;
-            transition: 0.3s;
+            transition: var(--transition);
             z-index: 1;
         }
 
-        .gallery-item:hover::before { opacity: 1; }
+        .gallery-item:hover::before {
+            opacity: 1;
+        }
 
         /* Lightbox */
         #lightbox {
@@ -82,14 +176,14 @@
             justify-content: center;
             align-items: center;
             padding: 40px;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
         }
 
         #lightbox img {
             max-width: 90%;
-            max-height: 85vh;
-            box-shadow: 0 0 50px rgba(0,0,0,1);
-            filter: contrast(1.1);
+            max-height: 80vh;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            filter: contrast(1.05);
             border: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -98,26 +192,46 @@
             top: 40px;
             right: 40px;
             color: white;
-            font-size: 3rem;
+            font-size: 2rem;
             cursor: pointer;
-            font-family: serif;
+            font-family: 'Outfit', sans-serif;
         }
 
-        #lightbox-info { margin-top: 2rem; color: #fff; font-family: 'Hessian', serif; text-align: center; width: 100%; position: absolute; bottom: 40px; }
-        #lightbox-title { font-size: 2.5rem; letter-spacing: 5px; margin-bottom: .5rem; }
-        #lightbox-date { color: #888; letter-spacing: 3px; font-size: 1rem; }
+        #lightbox-info {
+            position: absolute;
+            bottom: 40px;
+            text-align: center;
+            width: 100%;
+            color: #fff;
+        }
 
-        @media (max-width: 1024px) { .gallery-container { column-count: 2; } }
+        #lightbox-title {
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        #lightbox-date {
+            color: #666;
+            letter-spacing: 3px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 1024px) {
+            .gallery-container { column-count: 2; }
+        }
+
         @media (max-width: 768px) {
-            .gallery-container { column-count: 1; padding: 0 1.5rem 5rem 1rem; }
-            .gallery-header h1 { font-size: 3.5rem; }
-            #main-nav .nav-links { display: none; }
+            .gallery-container { column-count: 1; padding: 0 1rem 5rem 1rem; }
+            .gallery-header h1 { font-size: 3rem; }
+            .nav-links { display: none; }
         }
     </style>
 </head>
 <body>
-    <nav id="main-nav" class="scrolled">
-        <div class="container nav-content">
+    <nav id="main-nav">
+        <div class="nav-content">
             <a href="index.html" class="logo">SCORPION MC</a>
             <ul class="nav-links">
                 <li><a href="index.html">Hakkımızda</a></li>
@@ -128,13 +242,10 @@
                 <li><a href="tuzuk.html">Tüzük</a></li>
                 <li><a href="iletisim.html">İletişim</a></li>
             </ul>
-            <div class="menu-toggle">
-                <span></span><span></span><span></span>
-            </div>
         </div>
     </nav>
 
-    <main class="container">
+    <main>
         <div class="gallery-header">
             <h1 class="reveal">GALERİ</h1>
             <p class="reveal">Karanlık Sokaklardan Kareler</p>
@@ -161,11 +272,9 @@
         </div>
     </div>
 
-    <footer>
-        <div class="container">
-            <div class="footer-logo brand-font" style="font-family:'Hessian',serif;font-size:2rem;letter-spacing:10px;text-align:center;margin-bottom:1rem;margin-top:5rem;">SCORPION MC</div>
-            <p class="copyright" style="text-align:center;color:#444;font-size:0.7rem;letter-spacing:3px;padding-bottom:5rem;">© 2025 SCORPION MC. TÜM HAKLARI SAKLIDIR.</p>
-        </div>
+    <footer style="padding: 5rem 0; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);">
+        <div class="footer-logo" style="font-family:'Hessian',serif; font-size: 2rem; letter-spacing: 10px; margin-bottom: 1rem;">SCORPION MC</div>
+        <p style="color: #444; font-size: 0.7rem; letter-spacing: 3px;">© 2025 SCORPION MC. TÜM HAKLARI SAKLIDIR.</p>
     </footer>
 
     <script>
@@ -187,18 +296,17 @@
                 console.error('Galeri yüklenemedi:', e);
                 wrapper.innerHTML = '<p style="color:#555;text-align:center;padding:4rem;letter-spacing:2px">Fotoğraflar yüklenemedi.</p>';
             }
-            // Intersection Observer
+            
             const obs = new IntersectionObserver(entries => {
                 entries.forEach(en => { if (en.isIntersecting) en.target.classList.add('visible'); });
             }, { threshold: 0.1 });
             document.querySelectorAll('.gallery-item.reveal').forEach(el => obs.observe(el));
-            
-            // Fallback reveal
+
             setTimeout(() => {
                 document.querySelectorAll('.gallery-item.reveal').forEach(el => {
                     if (!el.classList.contains('visible')) el.classList.add('visible');
                 });
-            }, 1200);
+            }, 1000);
         }
 
         function checkAdmin() {
@@ -224,8 +332,6 @@
         loadGallery();
         checkAdmin();
     </script>
-    <script crossorigin id="vite-legacy-polyfill" src="./assets/polyfills-legacy-XJe6vqej.js"></script>
-    <script crossorigin id="vite-legacy-entry" data-src="./assets/galeri-legacy-XDi4Fj-j.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
     <script src="./assets/animations.js" defer></script>
 </body>
 </html>
