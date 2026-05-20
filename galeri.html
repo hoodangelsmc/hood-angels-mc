@@ -280,10 +280,31 @@
     <script>
         async function loadGallery() {
             const wrapper = document.getElementById('gallery-wrapper');
+            let data = null;
+            
+            // 1. Yerel JSON dosyasını çekmeye çalış (anlık güncelleme için)
             try {
-                const res = await fetch('https://raw.githubusercontent.com/scorpionsmc/scorpionmc/main/assets/gallery_data.json?t=' + Date.now());
-                if (!res.ok) throw new Error('JSON okunamadı');
-                const data = await res.json();
+                const res = await fetch('./assets/gallery_data.json?t=' + Date.now());
+                if (res.ok) {
+                    data = await res.json();
+                }
+            } catch (e) {
+                console.warn('Yerel galeri verisi yüklenemedi, GitHub yedek bağlantısı deneniyor:', e);
+            }
+
+            // 2. Yerel dosya başarısız olduysa veya veri bulunamadıysa GitHub CDN/Raw adresinden çek
+            if (!data) {
+                try {
+                    const res = await fetch('https://raw.githubusercontent.com/scorpionsmc/scorpionmc/main/assets/gallery_data.json?t=' + Date.now());
+                    if (!res.ok) throw new Error('GitHub JSON okunamadı');
+                    data = await res.json();
+                } catch (e) {
+                    console.error('GitHub yedek bağlantısı da başarısız oldu:', e);
+                }
+            }
+
+            // 3. Verileri ekrana render et
+            if (data && Array.isArray(data)) {
                 wrapper.innerHTML = '';
                 data.forEach(item => {
                     const div = document.createElement('div');
@@ -292,8 +313,7 @@
                     div.addEventListener('click', () => openLightbox(item.src, item.title, item.date));
                     wrapper.appendChild(div);
                 });
-            } catch (e) {
-                console.error('Galeri yüklenemedi:', e);
+            } else {
                 wrapper.innerHTML = '<p style="color:#555;text-align:center;padding:4rem;letter-spacing:2px">Fotoğraflar yüklenemedi.</p>';
             }
             

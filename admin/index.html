@@ -226,6 +226,9 @@
     <button class="nav-btn" id="nav-upload" onclick="switchTab('upload')">
       <i class="fa-solid fa-cloud-arrow-up"></i><span>Yükle</span>
     </button>
+    <button class="nav-btn" id="nav-trash" onclick="switchTab('trash')">
+      <i class="fa-solid fa-trash-can"></i><span>Çöp Kutusu</span>
+    </button>
 
     <div class="sidebar-spacer"></div>
     <a href="../galeri.html" class="sidebar-link">
@@ -248,6 +251,21 @@
         </div>
       </div>
       <div class="gallery-grid" id="gallery-grid"></div>
+    </div>
+
+    <!-- ÇÖP KUTUSU -->
+    <div class="screen" id="screen-trash">
+      <div class="header-row">
+        <div class="page-header">
+          <h1>ÇÖP KUTUSU</h1>
+          <p>Silinen fotoğraflar burada 30 gün boyunca saklanır</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-outline" onclick="loadTrash()"><i class="fa-solid fa-rotate"></i> Yenile</button>
+          <button class="btn-outline" style="border-color: rgba(255,77,77,0.3); color: var(--accent);" onclick="emptyTrash()"><i class="fa-solid fa-trash-can"></i> Çöpü Boşalt</button>
+        </div>
+      </div>
+      <div class="gallery-grid" id="trash-grid"></div>
     </div>
 
     <!-- YÜKLEME -->
@@ -299,6 +317,8 @@
 
   let galleryData = [];
   let currentSha  = "";
+  let trashData   = [];
+  let trashSha    = "";
   let queue       = [];
   let sortable    = null;
 
@@ -330,6 +350,12 @@
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('screen-' + tab).classList.add('active');
     document.getElementById('nav-' + tab).classList.add('active');
+    
+    if (tab === 'gallery') {
+      loadGallery();
+    } else if (tab === 'trash') {
+      loadTrash();
+    }
   }
 
   /* ---- OVERLAY & TOAST ---- */
@@ -342,31 +368,63 @@
   }
 
   /* ---- GITHUB ---- */
-  async function fetchJSON() {
-    const url = `https://api.github.com/repos/${CFG.owner}/${CFG.repo}/contents/assets/gallery_data.json?t=${Date.now()}`;
+  async function fetchJSON(filename = 'gallery_data.json') {
+    const url = `https://api.github.com/repos/${CFG.owner}/${CFG.repo}/contents/assets/${filename}?t=${Date.now()}`;
     const res = await fetch(url, { headers: { Authorization: `token ${CFG.token}`, Accept: 'application/vnd.github.v3+json' } });
-    if (!res.ok) throw new Error('GitHub bağlantı hatası: ' + res.status);
+    if (!res.ok) throw new Error(`GitHub bağlantı hatası (${filename}): ` + res.status);
     const meta = await res.json();
-    currentSha = meta.sha;
+    if (filename === 'gallery_data.json') {
+      currentSha = meta.sha;
+    } else if (filename === 'trash_data.json') {
+      trashSha = meta.sha;
+    }
     let raw = decodeURIComponent(escape(atob(meta.content.replace(/\n/g, ''))));
     if (raw.charCodeAt(0) === 0xFEFF) raw = raw.slice(1);
     return JSON.parse(raw);
   }
 
-  async function pushJSON(data, msg) {
-    const url = `https://api.github.com/repos/${CFG.owner}/${CFG.repo}/contents/assets/gallery_data.json`;
+  async function pushJSON(filename, data, msg) {
+    // Backward compatibility for pushJSON(data, msg)
+    if (typeof filename === 'object' || Array.isArray(filename)) {
+      msg = data;
+      data = filename;
+      filename = 'gallery_data.json';
+    }
+
+    const sha = filename === 'gallery_data.json' ? currentSha : trashSha;
+    const url = `https://api.github.com/repos/${CFG.owner}/${CFG.repo}/contents/assets/${filename}`;
     const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+    
+    // 1. Push to GitHub
     const res = await fetch(url, {
       method: 'PUT',
       headers: { Authorization: `token ${CFG.token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: msg, content: encoded, sha: currentSha })
+      body: JSON.stringify({ message: msg, content: encoded, sha: sha })
     });
     if (!res.ok) {
       const err = await res.json();
-      throw new Error('GitHub push hatası: ' + (err.message || res.status));
+      throw new Error(`GitHub push hatası (${filename}): ` + (err.message || res.status));
     }
     const resData = await res.json();
-    currentSha = resData.content.sha;
+    if (filename === 'gallery_data.json') {
+      currentSha = resData.content.sha;
+    } else if (filename === 'trash_data.json') {
+      trashSha = resData.content.sha;
+    }
+
+    // 2. Try to sync to the VDS locally via save.php
+    try {
+      await fetch('save.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${CFG.pass}`
+        },
+        body: JSON.stringify({ file: filename, content: data })
+      });
+    } catch (e) {
+      console.warn('Yerel sunucuya kaydedilemedi (normal, GitHub güncellendi):', e);
+    }
   }
 
   /* ---- GALLERY ---- */
@@ -384,10 +442,16 @@
   function renderGrid() {
     const grid = document.getElementById('gallery-grid');
     grid.innerHTML = '';
+    
+    if (galleryData.length === 0) {
+      grid.innerHTML = '<p style="color:#555; padding:4rem; grid-column:1/-1; text-align:center;">Galeri boş.</p>';
+      return;
+    }
+    
     galleryData.forEach((item, i) => {
       const card = document.createElement('div');
       card.className = 'photo-card';
-      card.dataset.idx = i;
+      card.dataset.src = item.src;
       card.innerHTML = `
         <div class="drag-handle"><i class="fa-solid fa-grip-lines"></i></div>
         <div class="card-img"><img src="${item.src}" loading="lazy"></div>
@@ -395,7 +459,7 @@
           <div class="card-title">${item.title}</div>
           <div class="card-date">${item.date}</div>
         </div>
-        <button class="card-del" onclick="deleteItem(${i})"><i class="fa-solid fa-trash"></i></button>
+        <button class="card-del" onclick="deleteItem('${item.src}')"><i class="fa-solid fa-trash"></i></button>
       `;
       grid.appendChild(card);
     });
@@ -407,24 +471,194 @@
       ghostClass: 'sortable-ghost',
       onEnd: () => {
         const newData = [];
-        grid.querySelectorAll('.photo-card').forEach(el => newData.push(galleryData[+el.dataset.idx]));
+        grid.querySelectorAll('.photo-card').forEach(el => {
+          const found = galleryData.find(item => item.src === el.dataset.src);
+          if (found) newData.push(found);
+        });
         galleryData = newData;
-        grid.querySelectorAll('.photo-card').forEach((el, i) => el.dataset.idx = i);
       }
     });
   }
 
-  async function deleteItem(i) {
-    if (!confirm('Bu fotoğrafı silmek istediğinize emin misiniz?')) return;
-    galleryData.splice(i, 1);
-    showOverlay('Siliniyor...');
+  async function deleteItem(src) {
+    if (!confirm('Bu fotoğrafı çöp kutusuna taşımak istediğinize emin misiniz?')) return;
+    showOverlay('Çöp kutusuna taşınıyor...');
     try {
-      await pushJSON(galleryData, 'Galeri: fotoğraf silindi');
+      // Fetch latest states to ensure consistency and prevent race conditions
+      const latestGallery = await fetchJSON('gallery_data.json');
+      const latestTrash = await fetchJSON('trash_data.json');
+      
+      const itemIdx = latestGallery.findIndex(item => item.src === src);
+      if (itemIdx === -1) throw new Error('Fotoğraf galeride bulunamadı!');
+      
+      const deletedItem = latestGallery[itemIdx];
+      deletedItem.deletedAt = new Date().toISOString(); // add deletion timestamp
+      
+      // Move item
+      latestTrash.unshift(deletedItem);
+      latestGallery.splice(itemIdx, 1);
+      
+      // Auto-prune items older than 30 days
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const activeTrash = latestTrash.filter(item => {
+        return !item.deletedAt || new Date(item.deletedAt) > thirtyDaysAgo;
+      });
+      
+      // Save both
+      await pushJSON('gallery_data.json', latestGallery, 'Galeri: fotoğraf silindi (çöp kutusuna taşındı)');
+      await pushJSON('trash_data.json', activeTrash, 'Galeri: çöp kutusu güncellendi');
+      
+      galleryData = latestGallery;
+      trashData = activeTrash;
+      
       renderGrid();
-      toast('Fotoğraf silindi! Site ~1 dk içinde güncellenir.');
+      toast('Fotoğraf çöp kutusuna taşındı! 30 gün boyunca kurtarabilirsiniz.');
     } catch(e) {
       toast(e.message, 'error');
-      galleryData = await fetchJSON(); renderGrid();
+    }
+    hideOverlay();
+  }
+
+  /* ---- TRASH BIN (ÇÖP KUTUSU) ---- */
+  async function loadTrash() {
+    const grid = document.getElementById('trash-grid');
+    grid.innerHTML = '<p style="color:#333; padding:4rem; grid-column:1/-1; text-align:center;">Yükleniyor...</p>';
+    try {
+      trashData = await fetchJSON('trash_data.json');
+      
+      // Auto-prune items older than 30 days on load
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      let needsSave = false;
+      const activeTrash = trashData.filter(item => {
+        const isExpired = item.deletedAt && new Date(item.deletedAt) < thirtyDaysAgo;
+        if (isExpired) needsSave = true;
+        return !isExpired;
+      });
+      
+      if (needsSave) {
+        trashData = activeTrash;
+        await pushJSON('trash_data.json', trashData, 'Galeri: süresi dolan çöpler otomatik temizlendi');
+      }
+      
+      renderTrashGrid();
+    } catch(e) {
+      grid.innerHTML = `<p style="color:var(--accent); padding:4rem; grid-column:1/-1; text-align:center;">${e.message}</p>`;
+    }
+  }
+
+  function renderTrashGrid() {
+    const grid = document.getElementById('trash-grid');
+    grid.innerHTML = '';
+    
+    if (trashData.length === 0) {
+      grid.innerHTML = '<p style="color:#555; padding:4rem; grid-column:1/-1; text-align:center;">Çöp kutusu boş.</p>';
+      return;
+    }
+    
+    const now = new Date();
+    
+    trashData.forEach((item) => {
+      // Calculate remaining days until permanent deletion
+      let daysRemaining = 30;
+      if (item.deletedAt) {
+        const delDate = new Date(item.deletedAt);
+        const diffTime = now - delDate;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        daysRemaining = Math.max(0, 30 - diffDays);
+      }
+      
+      const card = document.createElement('div');
+      card.className = 'photo-card';
+      card.innerHTML = `
+        <div class="card-img"><img src="${item.src}" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-title">${item.title}</div>
+          <div class="card-date" style="color:var(--accent); font-weight:500;"><i class="fa-regular fa-clock"></i> ${daysRemaining} Gün Kaldı</div>
+        </div>
+        <div class="card-actions" style="display: flex; gap: 0.5rem; padding: 0 1rem 1rem 1rem;">
+          <button class="btn-outline" style="flex: 1; padding: 0.5rem; font-size: 0.8rem; border-color: rgba(77,255,136,0.3); color: #4dff88;" onclick="restoreItem('${item.src}')">
+            <i class="fa-solid fa-arrow-rotate-left"></i> Geri Yükle
+          </button>
+          <button class="btn-outline" style="padding: 0.5rem 0.8rem; font-size: 0.8rem; border-color: rgba(255,77,77,0.3); color: var(--accent);" onclick="permanentlyDeleteItem('${item.src}')">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  async function restoreItem(src) {
+    showOverlay('Geri yükleniyor...');
+    try {
+      const latestGallery = await fetchJSON('gallery_data.json');
+      const latestTrash = await fetchJSON('trash_data.json');
+      
+      const itemIdx = latestTrash.findIndex(item => item.src === src);
+      if (itemIdx === -1) throw new Error('Fotoğraf çöp kutusunda bulunamadı!');
+      
+      const restoredItem = latestTrash[itemIdx];
+      delete restoredItem.deletedAt; // remove deletion timestamp
+      
+      // Put at the start of active gallery
+      latestGallery.unshift(restoredItem);
+      latestTrash.splice(itemIdx, 1);
+      
+      // Save both
+      await pushJSON('gallery_data.json', latestGallery, 'Galeri: fotoğraf çöp kutusundan geri yüklendi');
+      await pushJSON('trash_data.json', latestTrash, 'Galeri: fotoğraf geri yüklendiği için çöpten çıkarıldı');
+      
+      galleryData = latestGallery;
+      trashData = latestTrash;
+      
+      renderTrashGrid();
+      toast('Fotoğraf galeriye geri yüklendi! Sitede anında yayında.');
+    } catch(e) {
+      toast(e.message, 'error');
+    }
+    hideOverlay();
+  }
+
+  async function permanentlyDeleteItem(src) {
+    if (!confirm('Bu fotoğrafı kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) return;
+    showOverlay('Kalıcı olarak siliniyor...');
+    try {
+      const latestTrash = await fetchJSON('trash_data.json');
+      
+      const itemIdx = latestTrash.findIndex(item => item.src === src);
+      if (itemIdx === -1) throw new Error('Fotoğraf çöp kutusunda bulunamadı!');
+      
+      latestTrash.splice(itemIdx, 1);
+      
+      // Save trash
+      await pushJSON('trash_data.json', latestTrash, 'Galeri: fotoğraf çöp kutusundan kalıcı olarak silindi');
+      
+      trashData = latestTrash;
+      
+      renderTrashGrid();
+      toast('Fotoğraf kalıcı olarak silindi!');
+    } catch(e) {
+      toast(e.message, 'error');
+    }
+    hideOverlay();
+  }
+
+  async function emptyTrash() {
+    if (trashData.length === 0) {
+      toast('Çöp kutusu zaten boş!', 'error');
+      return;
+    }
+    if (!confirm('Çöp kutusundaki tüm fotoğrafları kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) return;
+    showOverlay('Çöp kutusu boşaltılıyor...');
+    try {
+      await pushJSON('trash_data.json', [], 'Galeri: çöp kutusu tamamen boşaltıldı');
+      trashData = [];
+      renderTrashGrid();
+      toast('Çöp kutusu başarıyla boşaltıldı!');
+    } catch(e) {
+      toast(e.message, 'error');
     }
     hideOverlay();
   }
