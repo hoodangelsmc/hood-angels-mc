@@ -1,7 +1,7 @@
-@echo off
+﻿@echo off
 chcp 65001 > nul
 echo =======================================
-echo   SCORPION MC - GITHUB GUNCELLEYICI
+echo   ANGELS HOOD MC - GITHUB GUNCELLEYICI
 echo =======================================
 echo.
 

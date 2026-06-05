@@ -1,4 +1,4 @@
-// ===== BAŞVURU FORMU JS =====
+﻿// ===== BAŞVURU FORMU JS =====
 
 let uploadedImageBase64 = null;
 
@@ -127,7 +127,7 @@ form.addEventListener('submit', async (e) => {
           url: "attachment://screenshot.png"
         },
         footer: {
-          text: "Scorpion MC Başvuru Sistemi",
+          text: "Angels Hood MC Başvuru Sistemi",
         },
         timestamp: new Date().toISOString()
       };

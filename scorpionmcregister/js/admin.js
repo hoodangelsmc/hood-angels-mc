@@ -1,4 +1,4 @@
-// ===== ADMIN PANEL JS =====
+﻿// ===== ADMIN PANEL JS =====
 
 // Auth check
 if (sessionStorage.getItem('scorpion_admin') !== 'true') {
@@ -153,7 +153,7 @@ document.getElementById('exportBtn').addEventListener('click', () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `scorpion_basvurular_${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `angels hood_basvurular_${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
   });
